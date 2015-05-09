@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+
+set -e
+[ -n "$PHPENV_DEBUG" ] && set -x
+
+if [ -z "$PHPENV_ROOT" ]; then
+  PHPENV_ROOT="${HOME}/.phpenv"
+fi
+
+shell="$1"
+if [ -z "$shell" ]; then
+  shell="$(ps c -p "$PPID" -o 'ucomm=' 2>/dev/null || true)"
+  shell="${shell##-}"
+  shell="${shell%% *}"
+  shell="$(basename "${shell:-$SHELL}")"
+fi
+
+indent_output() {
+  while read data; do
+    echo -e " \033[1;32m|\033[0m  $data"
+  done
+}
+
+colorize_output() {
+  while read data; do
+    echo -e "\033[1;32m$data\033[0m"
+  done
+}
+
+checkout() {
+  if [ ! -d "$2" ] ;then
+    git clone "$1" "$2"
+  else
+    git pull --no-rebase --ff
+  fi
+}
+
+test_write_permission_in_install_folder() {
+  local cmd_output=""
+  local file_test="$(dirname ${PHPENV_ROOT})/1"
+  set +e
+  cmd_output=$(touch $file_test 3>&1 2>&3 )
+  set -e
+
+  if [[ $cmd_output =~ "Permission denied" ]]; then
+    echo "ERROR" | colorize_output
+    echo "Permission denied when trying to write in ${PHPENV_ROOT}." | indent_output
+    echo "Adjust your \$PHPENV_ROOT or try to use sudo." | indent_output
+    exit 1
+  else
+    rm -rf $file_test
+  fi
+}
+
+
+install_phpenv() {
+  local sh="https://raw.githubusercontent.com/CHH/phpenv/master/bin/phpenv-install.sh"
+
+  echo "Installing phpenv" | colorize_output
+
+  if [ -d "$PHPENV_ROOT" ]; then
+    curl -L --silent ${sh} | UPDATE=yes PHPENV_ROOT=${PHPENV_ROOT} bash &>/dev/null
+  else
+    curl -L --silent ${sh} | PHPENV_ROOT=${PHPENV_ROOT} bash &>/dev/null
+  fi
+
+  echo "Done." | indent_output
+  echo
+}
+
+install_plugin() {
+  local vendor=${1%/*}
+  local plugin=${1#*/}
+
+  echo "Installing $vendor/$plugin" | colorize_output
+  checkout "https://github.com/${vendor}/${plugin}.git" "${PHPENV_ROOT}/plugins/${plugin}" &>/dev/null
+  echo "Done." | indent_output
+  echo
+}
+
+profile_by_shell() {
+  local profile
+  case "$shell" in
+  bash )
+    profile="~/.bash_profile"
+    ;;
+  zsh )
+    profile="~/.zshrc"
+    ;;
+  ksh )
+    profile="~/.profile"
+    ;;
+  fish )
+    profile="~/.config/fish/config.fish"
+    ;;
+  * )
+    profile="your profile"
+    ;;
+  esac
+  echo $profile
+}
+
+test_deps() {
+  if ! command -v git 1>/dev/null 2>&1; then
+    echo "phpenv: Git is not installed, can't continue." >&2 | indent_output
+    exit 1
+  fi
+
+  if ! command -v curl 1>/dev/null 2>&1; then
+    echo "phpenv: Curl is not installed, can't continue." >&2 | indent_output
+    exit 1
+  fi
+}
+
+test_if_phpenv_is_in_path() {
+  if ! command -v phpenv 1>/dev/null; then
+
+    { echo "WARNING" | colorize_output
+      echo "# Seems you still have not added 'phpenv' to the load path." | indent_output
+      echo | indent_output
+    } >&2
+
+    { echo "# Load phpenv automatically by adding" | indent_output
+      echo "# the following to $(profile_by_shell):" | indent_output
+      echo
+      case "$shell" in
+      fish )
+        echo "set -x PHPENV_ROOT \"${PHPENV_ROOT}\""
+        echo "if test -d \"$PHPENV_ROOT\""
+        echo "  set -x PATH \"$PHPENV_ROOT/bin\" \$PATH"
+        echo '  status --is-interactive; and . (phpenv init -|psub)'
+        echo "end"
+        ;;
+      * )
+        echo "export PHPENV_ROOT=\"${PHPENV_ROOT}\""
+        echo "if [ -d \"\${PHPENV_ROOT}\" ]; then"
+        echo "  export PATH=\"\${PHPENV_ROOT}/bin:\${PATH}\""
+        echo "  eval \"\$(phpenv init -)\""
+        echo "fi"
+        ;;
+      esac
+      echo
+    } >&2
+
+  else
+
+    { echo "Alright!" | colorize_output
+      echo "Execute:" | indent_output
+      echo "\`phpenv commands\`       to see all you can do" | indent_output
+      echo "\`phpenv help <command>\` for information on a specific command" | indent_output
+      echo
+    } >&2
+
+  fi
+}
+
+echo "INFO" | colorize_output
+echo "\$PHPENV_ROOT is defined as ${PHPENV_ROOT}" | indent_output
+echo
+test_write_permission_in_install_folder
+test_deps
+install_phpenv
+install_plugin "php-build/php-build"
+install_plugin "rogeriopradoj/phpenv-update"
+test_if_phpenv_is_in_path
