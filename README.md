@@ -10,7 +10,7 @@ It's the standard way: installs `phpenv` in $HOME/.phpenv (default
 $PHPENV_ROOT value).
 
 ```shell
-curl -L http://git.io/phpenv-installer \
+curl -L https://raw.githubusercontent.com/madumlao/phpenv-installer/master/bin/phpenv-installer \
     | bash
 ```
 
@@ -22,13 +22,13 @@ it's easy: just set $PHPENV_ROOT before the installer command:
 
 ```shell
 # $HOME/myphpenv
-curl -L http://git.io/phpenv-installer \
+curl -L https://raw.githubusercontent.com/madumlao/phpenv-installer/master/bin/phpenv-installer \
     | PHPENV_ROOT=$HOME/myphpenv bash
 ```
 
 ```shell
 # /usr/local/bin/phpenv
-curl -L http://git.io/phpenv-installer \
+curl -L https://raw.githubusercontent.com/madumlao/phpenv-installer/master/bin/phpenv-installer \
     | PHPENV_ROOT=/usr/local/bin/phpenv bash
 ```
 
