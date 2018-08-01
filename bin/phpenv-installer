@@ -54,14 +54,14 @@ test_write_permission_in_install_folder() {
 
 
 install_phpenv() {
-  local sh="https://raw.githubusercontent.com/CHH/phpenv/master/bin/phpenv-install.sh"
-
   echo "Installing phpenv" | colorize_output
 
   if [ -d "$PHPENV_ROOT" ]; then
-    curl -L --silent ${sh} | UPDATE=yes PHPENV_ROOT=${PHPENV_ROOT} bash &>/dev/null
+    cd "$PHPENV_ROOT"
+    git pull origin master
   else
-    curl -L --silent ${sh} | PHPENV_ROOT=${PHPENV_ROOT} bash &>/dev/null
+    local PHPENV_REPO=https://github.com/madumlao/phpenv
+    checkout "$PHPENV_REPO" "$PHPENV_ROOT"
   fi
 
   echo "Done." | indent_output
@@ -103,11 +103,6 @@ profile_by_shell() {
 test_deps() {
   if ! command -v git 1>/dev/null 2>&1; then
     echo "phpenv: Git is not installed, can't continue." >&2 | indent_output
-    exit 1
-  fi
-
-  if ! command -v curl 1>/dev/null 2>&1; then
-    echo "phpenv: Curl is not installed, can't continue." >&2 | indent_output
     exit 1
   fi
 }
@@ -161,6 +156,5 @@ test_write_permission_in_install_folder
 test_deps
 install_phpenv
 install_plugin "php-build/php-build"
-install_plugin "rogeriopradoj/phpenv-update"
 install_plugin "rogeriopradoj/phpenv-common-deps-install"
 test_if_phpenv_is_in_path

@@ -1,6 +1,6 @@
 # phpenv-installer
 
-Install [CHH/phpenv](https://github.com/CHH/phpenv) +
+Install [madumlao/phpenv](https://github.com/madumlao/phpenv) +
 [php-build/php-build](https://github.com/php-build/php-build) (and
 other plugins), updating all of them when you want to!
 
