@@ -41,6 +41,12 @@ permission. Feel free to ask if you need some help!
 phpenv update
 ```
 
+## Plugins installed by default
+
+- [php-build/php-build](https://github.com/php-build/php-build): allows `phpenv install`
+- [madumlao/phpenv-aliases](https://github.com/madumlao/phpenv-aliases): provides aliases for php versions
+- [ngyuki/phpenv-composer](https://github.com/ngyuki/phpenv-composer): automatically installs composer script for php version
+
 ## Uninstallation
 
 ```shell
