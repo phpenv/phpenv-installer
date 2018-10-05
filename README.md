@@ -24,13 +24,13 @@ it's easy: just set $PHPENV_ROOT before the installer command:
 
 ```shell
 # $HOME/myphpenv
-curl -L https://raw.githubusercontent.com/madumlao/phpenv-installer/master/bin/phpenv-installer \
+curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/phpenv-installer \
     | PHPENV_ROOT=$HOME/myphpenv bash
 ```
 
 ```shell
 # /usr/local/bin/phpenv
-curl -L https://raw.githubusercontent.com/madumlao/phpenv-installer/master/bin/phpenv-installer \
+curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/phpenv-installer \
     | PHPENV_ROOT=/usr/local/bin/phpenv bash
 ```
 
