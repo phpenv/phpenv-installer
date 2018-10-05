@@ -60,7 +60,7 @@ install_phpenv() {
     cd "$PHPENV_ROOT"
     git pull origin master
   else
-    local PHPENV_REPO=https://github.com/madumlao/phpenv
+    local PHPENV_REPO=https://github.com/phpenv/phpenv
     checkout "$PHPENV_REPO" "$PHPENV_ROOT"
   fi
 
