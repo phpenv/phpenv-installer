@@ -35,7 +35,7 @@ curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/php
 ```
 
 > Note: depends on the path, you will need superuser (sudo)
-permission. Feel free to ask if you need some help!
+permission. You may also want to `sudo chown -R /usr/local/bin/phpenv` so that you can run the phpenv utilities as a regular user. Feel free to ask if you need some help!
 
 ## Updating
 
