@@ -157,5 +157,6 @@ test_deps
 install_phpenv
 install_plugin "php-build/php-build"
 install_plugin "madumlao/phpenv-aliases"
+install_plugin "madumlao/phpenv-man"
 install_plugin "ngyuki/phpenv-composer"
 test_if_phpenv_is_in_path
