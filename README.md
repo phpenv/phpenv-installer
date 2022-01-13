@@ -1,13 +1,12 @@
-# phpenv-installer
+# phpenv-installer & doctor scripts
 
 Install [phpenv](https://github.com/phpenv/phpenv) +
 [php-build](https://github.com/php-build/php-build) (and
 other plugins), updating all of them when you want to!
 
-## Installation
+## phpenv-installer
 
-It's the standard way: installs `phpenv` in $HOME/.phpenv (default
-$PHPENV_ROOT value).
+It's the standard way: `phpenv-installer` idempotenttly installs or updates `phpenv` in $HOME/.phpenv (default $PHPENV_ROOT value).
 
 ```shell
 curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/phpenv-installer \
@@ -37,22 +36,31 @@ curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/php
 > Note: depends on the path, you will need superuser (sudo)
 permission. You may also want to `sudo chown -R /usr/local/bin/phpenv` so that you can run the phpenv utilities as a regular user. Feel free to ask if you need some help!
 
-## Updating
+### Updating
 
 ```shell
 phpenv update
 ```
 
-## Plugins installed by default
+### Plugins installed by default
 
 - [php-build/php-build](https://github.com/php-build/php-build): allows `phpenv install`
 - [madumlao/phpenv-aliases](https://github.com/madumlao/phpenv-aliases): provides aliases for php versions
 - [ngyuki/phpenv-composer](https://github.com/ngyuki/phpenv-composer): automatically installs composer script for php version
 
-## Uninstallation
+### Uninstallation
 
 ```shell
 rm -rf $(phpenv root)
+```
+
+## phpenv-doctor
+
+You can verify the state of your phpenv installation with:
+
+```shell
+curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/phpenv-doctor \
+    | bash
 ```
 
 <hr>
