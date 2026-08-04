@@ -17,7 +17,7 @@ fi
 
 indent_output() {
   while read data; do
-    echo -e " \033[1;32m|\033[0m  $data"
+    echo -e " \033[1;32m|\033[0m $data"
   done
 }
 
@@ -27,12 +27,32 @@ colorize_output() {
   done
 }
 
+# Ask the remote which branch HEAD points at, so an upstream default-branch
+# rename (e.g. master -> main) needs no change here.
+default_branch() {
+  git ls-remote --symref "$1" HEAD 2>/dev/null \
+    | awk '/^ref:/ { sub("refs/heads/", "", $2); print $2; exit }'
+}
+
 checkout() {
-  if [ ! -d "$2" ] ;then
-    git clone "$1" "$2"
-  else
-    git pull --no-rebase --ff
+  local repo="$1" dir="$2" branch
+
+  if [ ! -d "$dir/.git" ]; then
+    git clone "$repo" "$dir"
+    return
   fi
+
+  branch="$(default_branch "$repo")"
+  if [ -z "$branch" ]; then
+    echo "phpenv: cannot determine default branch of $repo" >&2
+    return 1
+  fi
+
+  # -C "$dir" rather than cd: act on the target repo, never on $PWD. Merging
+  # FETCH_HEAD keeps the local branch name irrelevant, so a checkout still
+  # called master fast-forwards onto main without being renamed first.
+  git -C "$dir" fetch --prune origin "$branch"
+  git -C "$dir" merge --ff-only FETCH_HEAD
 }
 
 test_write_permission_in_install_folder() {
@@ -52,18 +72,9 @@ test_write_permission_in_install_folder() {
   fi
 }
 
-
 install_phpenv() {
   echo "Installing phpenv" | colorize_output
-
-  if [ -d "$PHPENV_ROOT" ]; then
-    cd "$PHPENV_ROOT"
-    git pull origin main
-  else
-    local PHPENV_REPO=https://github.com/phpenv/phpenv
-    checkout "$PHPENV_REPO" "$PHPENV_ROOT"
-  fi
-
+  checkout "https://github.com/phpenv/phpenv" "$PHPENV_ROOT"
   echo "Done." | indent_output
   echo
 }
@@ -73,7 +84,7 @@ install_plugin() {
   local plugin=${1#*/}
 
   echo "Installing $vendor/$plugin" | colorize_output
-  checkout "https://github.com/${vendor}/${plugin}.git" "${PHPENV_ROOT}/plugins/${plugin}" &>/dev/null
+  checkout "https://github.com/${vendor}/${plugin}.git" "${PHPENV_ROOT}/plugins/${plugin}" >/dev/null
   echo "Done." | indent_output
   echo
 }
@@ -141,7 +152,7 @@ test_if_phpenv_is_in_path() {
 
     { echo "Alright!" | colorize_output
       echo "Execute:" | indent_output
-      echo "\`phpenv commands\`       to see all you can do" | indent_output
+      echo "\`phpenv commands\` to see all you can do" | indent_output
       echo "\`phpenv help <command>\` for information on a specific command" | indent_output
       echo
     } >&2
